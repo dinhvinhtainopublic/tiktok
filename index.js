@@ -1,11 +1,14 @@
 /**
- * Di Chùa Online — launcher. Running `node index.js` starts the app on port 14578.
+ * Di Chùa Online — launcher for hosting panels / VPS (e.g. Pterodactyl).
+ * `node index.js` starts the app on port 14578 and listens on 0.0.0.0 (reachable via the panel's allocation).
+ * For local use on your own PC prefer BAT-LIVE.bat.
  *
  * Defaults mirror BAT-LIVE.bat: LIVE_MODE=1 (the live stage page never hot-reloads mid-stream)
- * and the dashboard opens automatically after ~8s. Override with env vars if needed:
- *   PORT=14578        port to listen on (server.ts binds 127.0.0.1 only)
- *   LIVE_MODE=0       allow Vite hot reload (for editing, NOT while live)
- *   NO_OPEN=1         don't open the browser
+ * and the dashboard opens automatically after ~8s on Windows. Override with env vars:
+ *   PORT=14578            port to listen on (server.ts binds HOST)
+ *   HOST=0.0.0.0          listen address (panel/VPS); use HOST=127.0.0.1 for loopback only
+ *   LIVE_MODE=0           allow Vite hot reload (for editing, NOT while live)
+ *   NO_OPEN=1             don't open the browser
  *
  * Then open:
  *   http://localhost:14578/              dashboard (silent)
@@ -36,7 +39,9 @@ if (!fs.existsSync(tsxCli)) {
 const child = spawn(process.execPath, [tsxCli, 'server.ts'], {
   cwd: rootDir,
   stdio: 'inherit',
-  env: { ...process.env, PORT, LIVE_MODE },
+  // index.js is the panel/VPS launcher: listen on all interfaces so the allocation is reachable.
+  // (BAT-LIVE.bat stays on 127.0.0.1 — override with HOST=127.0.0.1 if needed.)
+  env: { ...process.env, PORT, LIVE_MODE, HOST: process.env.HOST || '0.0.0.0' },
 });
 
 let childGone = false;

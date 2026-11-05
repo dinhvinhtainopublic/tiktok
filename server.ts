@@ -482,8 +482,10 @@ async function startServer() {
   // Loopback only: the dashboard, the stage page and LIVE Studio all run on this computer (lvh.me resolves to
   // 127.0.0.1). Listening on every interface let anyone on the same Wi-Fi make the live voice say anything via
   // /api/control, switch the TikTok room, or use the TTS route. The API has no login, so keep it local.
-  app.listen(PORT, '127.0.0.1', () => {
-    console.log(`Chùa Online LIVE server running on http://localhost:${PORT}`);
+  // Local default stays 127.0.0.1 (the dashboard has no auth). A public panel/VPS must set HOST=0.0.0.0.
+  const HOST = process.env.HOST || '127.0.0.1';
+  app.listen(PORT, HOST, () => {
+    console.log(`Chùa Online LIVE server running on http://${HOST}:${PORT}`);
   });
 }
 
